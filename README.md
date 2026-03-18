@@ -1,6 +1,4 @@
-<div align="center">
-<img align="center" width="30%" alt="image" src="https://github.com/AI4Finance-Foundation/FinGPT/assets/31713746/e0371951-1ce1-488e-aa25-0992dafcc139">
-</div>
+
 
 # FinRL-X: An AI-Native Modular Infrastructure for Quantitative Trading
 <p align="center">
@@ -435,5 +433,7 @@ This software is for **educational and research purposes only**.
 - [Alpaca Markets](https://alpaca.markets/) - Brokerage API and market data
 
 ---
-
+<div align="center">
+<img align="center" width="30%" alt="image" src="https://github.com/AI4Finance-Foundation/FinGPT/assets/31713746/e0371951-1ce1-488e-aa25-0992dafcc139">
+</div>
 **Built with ❤️ for the quantitative finance community**
