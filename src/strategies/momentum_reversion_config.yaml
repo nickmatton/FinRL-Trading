@@ -1,0 +1,76 @@
+strategy:
+  name: momentum_reversion
+  version: "1.0.0"
+  description: >
+    Dual-factor strategy combining 12-1 month cross-sectional momentum
+    with 5-day short-term mean reversion.
+
+# ── Factor parameters ─────────────────────────────────────
+momentum:
+  lookback_months: 12
+  skip_months: 1
+
+reversion:
+  lookback_days: 5
+
+blending:
+  momentum_weight: 0.6
+  reversion_weight: 0.4
+
+# ── Portfolio construction ────────────────────────────────
+portfolio:
+  top_pct: 0.20            # select top 20% by momentum
+  max_positions: 20
+  max_single_weight: 0.10
+  min_weight: 0.01
+  rebalance_freq: "M"      # monthly
+
+# ── Asset universe ────────────────────────────────────────
+# A curated list of liquid large-cap US stocks across sectors.
+# Replace with your own ticker list as needed.
+symbols:
+  - AAPL
+  - MSFT
+  - GOOGL
+  - AMZN
+  - NVDA
+  - META
+  - TSLA
+  - JPM
+  - V
+  - UNH
+  - XOM
+  - JNJ
+  - PG
+  - MA
+  - HD
+  - ABBV
+  - KO
+  - PEP
+  - MRK
+  - COST
+  - AVGO
+  - LLY
+  - WMT
+  - ADBE
+  - CRM
+  - ORCL
+  - NFLX
+  - AMD
+  - INTC
+  - QCOM
+
+# ── Benchmarks ────────────────────────────────────────────
+benchmark:
+  tickers:
+    - SPY
+    - QQQ
+
+# ── Data ──────────────────────────────────────────────────
+paths:
+  data_root: ./data/fmp_daily
+  weights_dir: ./src/strategies/output/weights/momentum_reversion
+
+dates:
+  start_date: "2020-01-01"
+  end_date: null            # null = latest available

@@ -22,6 +22,7 @@ ACCOUNT=""               # Alpaca account name (paper mode)
 # Format: strategy_name|config_path|runner_path
 STRATEGIES="
 adaptive_rotation|src/strategies/AdaptiveRotationConf_v1.2.1.yaml|src/strategies/run_adaptive_rotation_strategy.py
+momentum_reversion|src/strategies/momentum_reversion_config.yaml|src/strategies/run_momentum_reversion.py
 "
 
 resolve_strategy() {
