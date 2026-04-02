@@ -15,3 +15,4 @@ from src.strategies.momentum_reversion_strategy import (
     MomentumReversionConfig,
     MomentumReversionStrategy,
 )
+from src.strategies.rl_strategy import RLStrategyConfig, RLPortfolioStrategy

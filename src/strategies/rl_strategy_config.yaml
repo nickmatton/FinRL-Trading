@@ -1,0 +1,71 @@
+strategy:
+  name: rl_portfolio
+  version: "1.0.0"
+  description: >
+    RL-based portfolio allocation using PPO to learn continuous
+    weight vectors from historical price data.
+
+# ── RL training parameters ────────────────────────────────
+training:
+  algorithm: PPO
+  total_timesteps: 50000
+  learning_rate: 0.0003
+  batch_size: 64
+  n_epochs: 10
+  gamma: 0.99
+
+# ── Environment parameters ────────────────────────────────
+environment:
+  window_size: 20
+  transaction_cost: 0.001
+  reward_scaling: 100.0
+
+# ── Walk-forward / rolling window ─────────────────────────
+rolling:
+  train_days: 504          # ~2 years of trading days
+  retrain_freq: "Q"        # retrain quarterly
+
+# ── Portfolio constraints ─────────────────────────────────
+portfolio:
+  max_positions: 20
+  max_single_weight: 0.15
+  min_weight: 0.01
+
+# ── Asset universe ────────────────────────────────────────
+symbols:
+  - AAPL
+  - MSFT
+  - GOOGL
+  - AMZN
+  - NVDA
+  - META
+  - TSLA
+  - JPM
+  - V
+  - UNH
+  - XOM
+  - JNJ
+  - PG
+  - MA
+  - HD
+  - ABBV
+  - KO
+  - PEP
+  - MRK
+  - COST
+
+# ── Benchmarks ────────────────────────────────────────────
+benchmark:
+  tickers:
+    - SPY
+    - QQQ
+
+# ── Paths ─────────────────────────────────────────────────
+paths:
+  data_root: ./data/fmp_daily
+  model_dir: ./models/rl_portfolio
+  weights_dir: ./src/strategies/output/weights/rl_portfolio
+
+dates:
+  start_date: "2020-01-01"
+  end_date: null
