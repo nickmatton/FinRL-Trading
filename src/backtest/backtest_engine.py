@@ -411,22 +411,26 @@ class BacktestEngine:
 
         for ticker in self.config.benchmark_tickers:
             try:
-                # Fetch benchmark price data
-                bm_data = fetch_price_data([ticker], start_date, end_date)
-                if bm_data.empty:
-                    self.logger.warning(f"No data for benchmark {ticker}, skipping")
-                    continue
+                # Use benchmark data from price_data if already present
+                if ticker in price_data.columns:
+                    bm_prices = price_data[[ticker]].dropna()
+                else:
+                    # Fetch benchmark price data externally
+                    bm_data = fetch_price_data([ticker], start_date, end_date)
+                    if bm_data.empty:
+                        self.logger.warning(f"No data for benchmark {ticker}, skipping")
+                        continue
 
-                # Prepare price data (single column)
-                bm_prices = bm_data.pivot(index='datadate', columns='tic', values='adj_close')
-                bm_prices.index = pd.to_datetime(bm_prices.index)
-                bm_prices = bm_prices.ffill().dropna(how='all')
+                    # Prepare price data (single column)
+                    bm_prices = bm_data.pivot(index='datadate', columns='tic', values='adj_close')
+                    bm_prices.index = pd.to_datetime(bm_prices.index)
+                    bm_prices = bm_prices.ffill().dropna(how='all')
 
-                if bm_prices.empty or ticker not in bm_prices.columns:
-                    self.logger.warning(f"No valid price data for {ticker}")
-                    continue
+                    if bm_prices.empty or ticker not in bm_prices.columns:
+                        self.logger.warning(f"No valid price data for {ticker}")
+                        continue
 
-                bm_prices = bm_prices[[ticker]]  # Single column DataFrame
+                    bm_prices = bm_prices[[ticker]]  # Single column DataFrame
 
                 # Create buy-and-hold strategy
                 bh_strategy = bt.Strategy(

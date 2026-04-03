@@ -8,7 +8,7 @@ strategy:
 # ── RL training parameters ────────────────────────────────
 training:
   algorithm: PPO
-  total_timesteps: 50000
+  total_timesteps: 100000
   learning_rate: 0.0003
   batch_size: 64
   n_epochs: 10
@@ -27,12 +27,13 @@ rolling:
 
 # ── Portfolio constraints ─────────────────────────────────
 portfolio:
-  max_positions: 20
-  max_single_weight: 0.15
+  max_positions: 25
+  max_single_weight: 0.10
   min_weight: 0.01
 
-# ── Asset universe ────────────────────────────────────────
+# ── Asset universe (50 large-cap US stocks) ───────────────
 symbols:
+  # Tech
   - AAPL
   - MSFT
   - GOOGL
@@ -40,19 +41,54 @@ symbols:
   - NVDA
   - META
   - TSLA
+  - AVGO
+  - ADBE
+  - CRM
+  - ORCL
+  - NFLX
+  - AMD
+  - INTC
+  - QCOM
+  # Finance
   - JPM
   - V
-  - UNH
-  - XOM
-  - JNJ
-  - PG
   - MA
-  - HD
+  - BAC
+  - GS
+  - BLK
+  - AXP
+  # Health
+  - UNH
+  - JNJ
+  - LLY
   - ABBV
+  - MRK
+  - PFE
+  - TMO
+  - ABT
+  # Consumer
+  - PG
   - KO
   - PEP
-  - MRK
   - COST
+  - WMT
+  - HD
+  - MCD
+  - NKE
+  # Energy / Industrials
+  - XOM
+  - CVX
+  - CAT
+  - GE
+  - UNP
+  - HON
+  # Comm / Utilities / Real Estate
+  - DIS
+  - CMCSA
+  - T
+  - NEE
+  - SO
+  - AMT
 
 # ── Benchmarks ────────────────────────────────────────────
 benchmark:

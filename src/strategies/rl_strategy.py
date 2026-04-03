@@ -18,6 +18,7 @@ the backtest engine and Alpaca execution pipeline.
 """
 
 import logging
+import time
 from typing import Dict, Optional, Any
 from dataclasses import dataclass
 from pathlib import Path
@@ -98,17 +99,18 @@ class RLPortfolioStrategy(BaseStrategy):
             verbose=verbose,
         )
 
+        t0 = time.time()
         self.model.learn(total_timesteps=cfg.total_timesteps)
+        elapsed = time.time() - t0
 
-        self.logger.info(
-            f"Training complete: {cfg.total_timesteps} timesteps, "
-            f"{len(prices_wide.columns)} assets"
-        )
+        print(f"    Training done: {cfg.total_timesteps:,} timesteps, "
+              f"{len(prices_wide.columns)} assets, {elapsed:.1f}s")
 
         return {
             "total_timesteps": cfg.total_timesteps,
             "n_assets": len(prices_wide.columns),
             "train_days": len(prices_wide),
+            "elapsed_seconds": round(elapsed, 1),
         }
 
     def save_model(self, path: Optional[str] = None):
@@ -269,14 +271,23 @@ class RLPortfolioStrategy(BaseStrategy):
                 rebalance_dates.append(mask[-1])
         rebalance_dates = sorted(set(rebalance_dates))
 
+        n_rounds = len(rebalance_dates)
+        print(f"\n{'='*60}")
+        print(f"  Walk-Forward RL Training: {n_rounds} rebalance dates")
+        print(f"  Retrain each round: {retrain}")
+        print(f"  Timesteps per round: {cfg.total_timesteps:,}")
+        print(f"{'='*60}")
+
         if not retrain:
             # Train once on data up to start
+            print(f"\n  Training single model on data up to {start.date()}...")
             train_slice = prices_wide.loc[:start].iloc[-cfg.train_days:]
             if len(train_slice) > cfg.window_size + 10:
                 self.train(train_slice, verbose=0)
 
         rows = {}
-        for dt in rebalance_dates:
+        total_t0 = time.time()
+        for i, dt in enumerate(rebalance_dates, 1):
             train_end = dt
             train_start_idx = max(
                 0,
@@ -289,14 +300,18 @@ class RLPortfolioStrategy(BaseStrategy):
                                            )[0] + 1]
 
             if len(train_slice) <= cfg.window_size + 10:
+                print(f"\n  [Round {i}/{n_rounds}] {dt.date()} — skipped (insufficient data)")
                 continue
+
+            train_start_date = train_slice.index[0].date()
+            print(f"\n  [Round {i}/{n_rounds}] {dt.date()} | "
+                  f"Training on {len(train_slice)} days "
+                  f"({train_start_date} → {dt.date()})...")
 
             if retrain:
                 self.train(train_slice, verbose=0)
 
             weights_arr = self.predict_weights(train_slice)
-            row = pd.Series(0.0, index=prices_wide.columns)
-            row[:] = weights_arr
 
             # Apply risk limits
             wdf = pd.DataFrame({"tic": prices_wide.columns, "weight": weights_arr})
@@ -304,6 +319,18 @@ class RLPortfolioStrategy(BaseStrategy):
             row = pd.Series(0.0, index=prices_wide.columns)
             row.update(wdf.set_index("tic")["weight"])
             rows[dt] = row
+
+            # Print top holdings
+            top = wdf.nlargest(5, "weight")
+            holdings_str = ", ".join(
+                f"{r['tic']} {r['weight']:.1%}" for _, r in top.iterrows()
+            )
+            print(f"    → {len(wdf)} positions | Top 5: {holdings_str}")
+
+        total_elapsed = time.time() - total_t0
+        print(f"\n{'='*60}")
+        print(f"  Walk-forward complete: {len(rows)} rounds in {total_elapsed:.1f}s")
+        print(f"{'='*60}\n")
 
         if not rows:
             return pd.DataFrame(

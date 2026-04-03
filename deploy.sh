@@ -285,6 +285,11 @@ with open(config_path) as f:
 # Extract all symbols from config
 symbols = set()
 
+# Top-level symbols list (momentum_reversion, rl_portfolio configs)
+for sym in config.get("symbols", []):
+    symbols.add(sym)
+
+# Asset groups (adaptive_rotation config)
 for group_name, group in config.get("asset_groups", {}).items():
     for sym in group.get("symbols", []):
         symbols.add(sym)
@@ -296,6 +301,10 @@ for sym in fallback.get("symbols", []):
 bench = config.get("benchmark", {})
 if "excess_return_benchmark" in bench:
     symbols.add(bench["excess_return_benchmark"])
+
+# Benchmark tickers list
+for sym in bench.get("tickers", []):
+    symbols.add(sym)
 
 symbols.update(["^GSPC", "^VIX", "SPY", "QQQ"])
 

@@ -225,6 +225,8 @@ def main():
     parser.add_argument("--backtest", action="store_true")
     parser.add_argument("--start", default="2022-01-01")
     parser.add_argument("--end", default=str(date.today()))
+    parser.add_argument("--freq", default="Q", help="Rebalance frequency (ignored, uses config)")
+    parser.add_argument("--no-daily-fast-track", action="store_true", help="Ignored (compatibility)")
     parser.add_argument("--date", default=None, help="Single decision date")
     args = parser.parse_args()
 
